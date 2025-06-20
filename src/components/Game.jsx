@@ -222,7 +222,7 @@ const Game = ({ gameState, username, setGameState, onBack, fetchLeaderboard, set
     const images = {};
     const imageStatus = {};
 
-    ['pink', 'purple', 'orange', 'blue', 'green', 'small_bomb', 'big_bomb', 'slow', 'clear', 'background'].forEach(
+    ['pink', 'purple', 'orange', 'blue', 'green', 'small_bomb', 'big_bomb'].forEach(
       (type) => {
         images[type] = new Image();
         images[type].src = `/${type}.png`;

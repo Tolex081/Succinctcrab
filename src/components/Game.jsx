@@ -32,12 +32,15 @@ const Game = ({ gameState, username, setGameState, onBack, fetchLeaderboard, set
 
   const colors = useMemo(() => ['pink', 'purple', 'orange', 'blue', 'green'], []);
 
+  // --------- Changed here: Added spawnCooldownMs and adjusted spawnObject ---------
+  const spawnCooldownMs = 800; // Increased cooldown from 200 to 800 ms
+
   const spawnObject = useCallback(() => {
     const now = Date.now();
     if (
       objects.length < maxObjects &&
       Math.random() < 0.03 &&
-      now - lastSpawnTime.current > 200
+      now - lastSpawnTime.current > spawnCooldownMs
     ) {
       const isBomb = Math.random() < bombSpawnChance;
       const isPowerUp = Math.random() < 0.05;
@@ -59,6 +62,7 @@ const Game = ({ gameState, username, setGameState, onBack, fetchLeaderboard, set
       lastSpawnTime.current = now;
     }
   }, [colors, objects, maxObjects, bombSpawnChance]);
+  // -------------------------------------------------------------------------------
 
   const handleTouch = useCallback(
     (e) => {

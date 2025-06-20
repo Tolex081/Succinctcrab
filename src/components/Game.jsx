@@ -26,22 +26,21 @@ const Game = ({ gameState, username, setGameState, onBack, fetchLeaderboard, set
   const [bombSpawnChance, setBombSpawnChance] = useState(0.2);
   const lastSpawnTime = useRef(0);
 
-  // ---------- Added lastClickTime for debounce ---------------
-  const lastClickTime = useRef(0);
-  const clickCooldownMs = 300; // 300ms debounce
-
   useEffect(() => {
     console.log('Game component mounted with username:', username);
   }, [username]);
 
   const colors = useMemo(() => ['pink', 'purple', 'orange', 'blue', 'green'], []);
 
+  // --------- Changed here: Added spawnCooldownMs and adjusted spawnObject ---------
+  const spawnCooldownMs = 800; // Increased cooldown from 200 to 800 ms
+
   const spawnObject = useCallback(() => {
     const now = Date.now();
     if (
       objects.length < maxObjects &&
       Math.random() < 0.03 &&
-      now - lastSpawnTime.current > 200
+      now - lastSpawnTime.current > spawnCooldownMs
     ) {
       const isBomb = Math.random() < bombSpawnChance;
       const isPowerUp = Math.random() < 0.05;
@@ -63,19 +62,11 @@ const Game = ({ gameState, username, setGameState, onBack, fetchLeaderboard, set
       lastSpawnTime.current = now;
     }
   }, [colors, objects, maxObjects, bombSpawnChance]);
+  // -------------------------------------------------------------------------------
 
   const handleTouch = useCallback(
     (e) => {
       if (e.type === 'touchstart') e.preventDefault();
-      const now = Date.now();
-
-      // -------- Debounce check: ignore clicks if too soon after last click --------
-      if (now - lastClickTime.current < clickCooldownMs) {
-        console.log('Click ignored due to debounce');
-        return;
-      }
-      lastClickTime.current = now;
-
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -134,7 +125,6 @@ const Game = ({ gameState, username, setGameState, onBack, fetchLeaderboard, set
         setIsPaused(false);
         setCanClearBombs(true);
         objects.length = 0;
-        lastClickTime.current = 0; // reset debounce on restart
       }
     },
     [gameState, gameOver, isPaused, objects, setGameState, onBack]
@@ -225,7 +215,6 @@ const Game = ({ gameState, username, setGameState, onBack, fetchLeaderboard, set
       setBombSpawnChance(0.2);
       setCanClearBombs(true);
       objects.length = 0;
-      lastClickTime.current = 0; // reset debounce on new game start
     }
   }, [gameState, gameOver, startTime, objects]);
 
